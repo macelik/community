@@ -21,8 +21,15 @@ ACTIVATE=${BASE}/bin/activate
 default: help
 
 install-conda: ## install Miniconda
-	curl -L $(MINICONDA_URL) -o miniconda.sh
-	bash miniconda.sh -b
+	ifeq ($(OS),Windows_NT)
+		MINICONDA_URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
+		powershell -Command "(New-Object System.Net.WebClient).DownloadFile('$(MINICONDA_URL)', 'miniconda.exe')"
+		.\miniconda.exe /InstallationType=JustMe /RegisterPython=0 /S /D=%USERPROFILE%\Miniconda3
+	else
+		MINICONDA_URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+		curl -L $(MINICONDA_URL) -o miniconda.sh
+		bash miniconda.sh -b
+	endif
 .PHONY: install-conda
 
 create-env: ## create conda environment
